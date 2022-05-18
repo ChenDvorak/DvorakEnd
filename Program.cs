@@ -1,9 +1,7 @@
-using System.Security.Claims;
 using DvorakEnd.EntityFramework;
 using DvorakEnd.Utilities;
 using Microsoft.EntityFrameworkCore;
 using DvorakEnd.Controllers;
-using DvorakEnd.Controllers.Post;
 using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -22,28 +20,25 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
        options.ExpireTimeSpan = TimeSpan.FromDays(1);
        options.SlidingExpiration = true;
    });
-builder.Services.AddAuthorization(options =>
-{
-    options.AddPolicy("AuthorOnly", policy =>
+
+builder.AddAuthorOnlyAuthorization();
+builder.AuthorizationFailureToUnauthorized();
+
+const string ALLOW_FRONT_CROS_POLICY = "allow_front_cros_policy";
+builder.Services.AddCors(options =>
+    options.AddPolicy(name: ALLOW_FRONT_CROS_POLICY, b =>
     {
-        policy.RequireAssertion(context =>
-        {
-            var account = builder.Configuration.GetSection("Account").Value;
-            var nameClaim = context.User.Claims.FirstOrDefault(t => t.Type == ClaimTypes.Name);
-            if (nameClaim is null)
-            {
-                return false;
-            }
-            return BCrypt.Net.BCrypt.Verify(account, nameClaim.Value);
-        });
-    });
-});
+        var allowOrigins = (string[])builder.Configuration.GetSection("Cors:AllowOrigin").Get(typeof(string[]));
+        b.WithOrigins(allowOrigins);
+    })
+);
 
 var app = builder.Build()
                  .MigrateDbContext<BlogsContext>();
 
 app.EnsureConfiguration();
 
+app.UseCors(ALLOW_FRONT_CROS_POLICY);
 app.UseAuthentication();
 app.UseAuthorization();
 

@@ -1,5 +1,4 @@
 using System.Security.Claims;
-using DvorakEnd.EntityFramework;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
@@ -40,6 +39,12 @@ public static class LoginControllerExtensions
         web.MapPost("/logout", [Authorize("AuthorOnly")] async (HttpContext context) =>
         {
             await context.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+        });
+
+        web.MapPost("/ChenkLogged", [Authorize("AuthorOnly")] () =>
+        {
+            // Results.Challenge
+            return Results.Ok();
         });
 
         return web;
