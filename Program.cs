@@ -17,6 +17,7 @@ builder.Services.AddDbContext<BlogsContext>(
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
    .AddCookie(options =>
    {
+       options.Cookie.SameSite = SameSiteMode.None;
        options.ExpireTimeSpan = TimeSpan.FromDays(1);
        options.SlidingExpiration = true;
    });
@@ -28,8 +29,11 @@ const string ALLOW_FRONT_CROS_POLICY = "allow_front_cros_policy";
 builder.Services.AddCors(options =>
     options.AddPolicy(name: ALLOW_FRONT_CROS_POLICY, b =>
     {
-        var allowOrigins = (string[])builder.Configuration.GetSection("Cors:AllowOrigin").Get(typeof(string[]));
-        b.WithOrigins(allowOrigins);
+        var allowOrigins = builder.Configuration.GetSection("Cors:AllowOrigins").Value;
+        b.WithOrigins(allowOrigins)
+         .AllowAnyHeader()
+         .AllowAnyMethod()
+         .AllowCredentials();
     })
 );
 

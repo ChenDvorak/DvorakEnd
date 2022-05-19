@@ -41,9 +41,8 @@ public static class LoginControllerExtensions
             await context.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
         });
 
-        web.MapPost("/ChenkLogged", [Authorize("AuthorOnly")] () =>
+        web.MapPost("/CheckLogged", [Authorize("AuthorOnly")] () =>
         {
-            // Results.Challenge
             return Results.Ok();
         });
 
