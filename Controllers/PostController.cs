@@ -28,8 +28,9 @@ public static class PostControllerExtensions
         {
             var blogs = string.IsNullOrWhiteSpace(s)
                 ? await db.Blogs.ToListAsync()
-                : await db.Blogs.Where(blog => blog.Title.Contains(s) || blog.Category.Contains(s)).ToListAsync();
-
+                : await db.Blogs.Where(blog => blog.Title.Contains(s) || blog.Category.Contains(s))
+                                .ToListAsync();
+            blogs.Reverse();
             return Results.Ok(blogs);
         });
 
