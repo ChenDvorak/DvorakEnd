@@ -37,10 +37,12 @@ builder.Services.AddCors(options =>
     })
 );
 
+builder.EnsureConfiguration();
+
 var app = builder.Build()
                  .MigrateDbContext<BlogsContext>();
 
-app.EnsureConfiguration();
+app.UseHttpsRedirection();
 
 app.UseCors(ALLOW_FRONT_CROS_POLICY);
 app.UseAuthentication();
